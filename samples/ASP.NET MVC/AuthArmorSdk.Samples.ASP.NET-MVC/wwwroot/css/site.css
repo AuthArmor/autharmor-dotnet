@@ -1,0 +1,210 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Poppins", sans-serif;
+}
+
+a {
+    color: #e1e1e1;
+    text-decoration: none;
+}
+body
+{
+    background-color: #333333;
+    color: #e1e1e1;
+}
+
+    a:hover {
+        color: #ffffff;
+        text-decoration: underline;
+    }
+
+.header {
+    background: #539aac;
+}
+
+.container {
+    max-width: 1140px;
+    margin: 0 auto;
+    padding: 0 1rem;
+
+}
+
+.logo p {
+    font-weight: bold;
+    font-size: 20px;
+}
+
+    /*.logo p:hover {
+        text-decoration: underline;
+        color: #fff;
+    }*/
+
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 0;
+}
+
+    .navbar nav {
+        flex: 1;
+        text-align: right;
+    }
+
+#menuItems {
+    display: inline-flex;
+}
+
+
+    #menuItems li {
+        list-style: none;
+    }
+
+    #menuItems a {
+        padding: 1rem;
+    }
+
+        #menuItems a:hover {
+            color: #e1e1e1;
+            text-decoration: underline;
+        }
+
+.sign_up {
+    background: #294D56;
+    color: #e1e1e1;
+    padding: 0.5rem 1rem;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-left: 2px;
+}
+    .sign_up:hover {
+        background-color: #35636F;
+    }
+
+/* BANNER */
+.banner {
+    text-align: center;
+}
+
+    .banner h1 {
+        font-size: 3.5rem;
+    }
+
+.menu_icon {
+    display: none;
+    cursor: pointer;
+    width: 28px;
+    margin-left: 20px;
+}
+
+/*  MEDIA QUERY */
+@media (max-width: 629px) {
+    #menuItems {
+        flex-direction: column;
+    }
+
+    .menu_icon {
+        display: block;
+        cursor: pointer;
+    }
+
+    nav ul {
+        position: absolute;
+        top: 70px;
+        left: 0;
+        background: #333;
+        width: 100%;
+        overflow: hidden;
+        transition: 0.5s;
+    }
+
+        nav ul li {
+            display: block;
+            margin-right: 50px;
+            margin-top: 10px;
+            margin-bottom: 10px;
+        }
+
+            nav ul li a {
+                color: #fff;
+            }
+}
+
+@media (max-width: 425px) {
+    .logo p {
+        font-size: 15px;
+    }
+
+    nav ul {
+        position: absolute;
+        top: 60px;
+    }
+
+    .sign_up {
+        padding: 0.3rem 0.7rem;        
+        font-size: 0.8rem;
+    }
+
+    .menu_icon {
+        width: 23px;
+    }
+
+    .banner h1 {
+        font-size: 2.5rem;
+    }
+
+    .banner p {
+        font-size: 0.8rem;
+    }
+}
+
+.content {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    -webkit-transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%);    
+    width: 100%;
+}
+
+
+/* The Modal (background) */
+.modal {
+    display: none; /* Hidden by default */
+    position: absolute; /* Stay in place */
+    z-index: 1; /* Sit on top */
+    left: 50%;
+    top: 50%;
+    -webkit-transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%);
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    background-color: rgb(0,0,0); /* Fallback color */
+    background-color: rgba(0,0,0,0.8); /* Black w/ opacity */
+}
+
+/* Modal Content */
+.modal-content {
+    text-align: center;
+    background-color: #fefefe;
+    margin: auto;
+    padding: 20px;
+    width: 25%;
+}
+
+/* The Close Button */
+.close {
+    color: #aaaaaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+    .close:hover,
+    .close:focus {
+        color: #000;
+        text-decoration: none;
+        cursor: pointer;
+    }

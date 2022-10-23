@@ -1,0 +1,60 @@
+﻿
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auth Armor SDK Demo</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+</head>
+<body>
+
+    <!-- START HEADER -->
+    <header class="header">
+        <div class="container">
+            <div class="navbar">
+                <div class="logo">
+                    <p>Auth Armor SDK Sample</p>
+                </div>
+                <nav>
+                    <ul id="menuItems">
+                        <li><a href="#">Home</a></li>
+                        <li><a href="#">About</a></li>
+                        <li><a href="#">Contact</a></li>
+                    </ul>
+                </nav>
+                
+                @if (User?.Identity?.IsAuthenticated == true)
+                {
+                    <a class="sign_up" href="~/logout">Sign out</a>
+                }
+                else
+                {
+                    <a class="sign_up" href="~/login">Sign in</a>
+                    <a class="sign_up" href="~/register">Register</a>
+                }
+                <img class="menu_icon" src="img/menu.png" onclick="menutoggle()" />
+            </div>
+        </div>
+    </header>
+    <!-- END HEADER -->
+        @RenderBody()
+    <script>
+        // TOGGLE MENU
+        var menuItems = document.getElementById("menuItems");
+        menuItems.style.maxHeight = "0px";
+
+        function menutoggle() {
+            if (menuItems.style.maxHeight == "0px") {
+                menuItems.style.maxHeight = "200px";
+            } else {
+                menuItems.style.maxHeight = "0px";
+            }
+        }
+
+    </script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

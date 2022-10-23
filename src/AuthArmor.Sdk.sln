@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30804.86
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuthArmor.Sdk", "AuthArmor.Sdk\AuthArmor.Sdk.csproj", "{91A1DE90-585C-48B2-BED7-85CCC291E637}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{91A1DE90-585C-48B2-BED7-85CCC291E637}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{91A1DE90-585C-48B2-BED7-85CCC291E637}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{91A1DE90-585C-48B2-BED7-85CCC291E637}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{91A1DE90-585C-48B2-BED7-85CCC291E637}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {014A07D6-6A85-45E3-913F-03BB2C53B6BD}
+	EndGlobalSection
+EndGlobal

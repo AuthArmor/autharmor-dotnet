@@ -1,0 +1,106 @@
+﻿@section scripts {
+    @*<script src="https://dvdtstscripts.blob.core.windows.net/scripts/autharmor-jsclient-sdk/v3.0.0/DEV-autharmor-jsclient-sdk.js"></script>*@ <!-- test -->
+    <script src="https://cdn.autharmor.com/scripts/autharmor-jsclient-sdk/v3.0.0/autharmor-jsclient-sdk.js"></script> <!-- prod -->
+    <script>
+        (async () => {
+            let selectedMethods = ["authenticator", "webauthn", "magiclink-email"];
+            
+
+            const formConfig = {
+                preferences: {
+                    login: {
+                        default: {
+                            action_name: "Auth Armor SDK Demo Site - Login",
+                            short_msg:
+                                "Auth Armor SDK Demo site login pending, please approve",
+                            timeout_in_seconds: 90
+                        },
+                        magiclink: {
+                            action_name: "Auth Armor SDK Demo Site - Magic Link Login"
+                        }
+                    },
+                    register: {
+                        default: {
+                            action_name: "Verify Email and Register",
+                            short_msg:
+                                "Auth Armor SDK Demo site registration pending, please verify you email and register",
+                            timeout_in_seconds: 300
+                        },
+                    }
+                }
+            };
+
+            const AuthArmor = new window.AuthArmorSDK({
+                methods: selectedMethods,
+                clientSdkApiKey:
+                    //"eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IjhiNzhkYTFmLWU4NWEtNDg4Ny05MmQxLTcyNWZlNTg3MGFiZCJ9.eyJrZXkiOiJkcVdmOVMzbVpHN0tMdEFZeWF2NlB3UmhnRGgyNWlKaTVzdmhTcUJBVWtMbnBxdW4iLCJpYXQiOjE2NjAxNDgxMzB9.jP6S34ONJLUCVeLpHmqSVbXkokMY3FhyOy5yhS_MhGEEkWKJ9e2F3GJWyAOXk62MYPZUDYVWwUMj7SAqmVFaYg", //dev/test
+                    "eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IjhiNzhkYTFmLWU4NWEtNDg4Ny05MmQxLTcyNWZlNTg3MGFiZCJ9.eyJrZXkiOiJRTXI2UEFkeVlTWEdxOVh6UzNtdGlFcUQ3M0FmcnhTZkhNeVBuQndqN21iZndKUmsiLCJpYXQiOjE2NjQ4MzA4MDh9.Oh1mJ7qZFJTiNb8PoDODCwOnYXWZ0fBv5Ng6NikArPbHUsJ_CrFDBuJPSSNBMDOgCUF-OFWuqJgXWvw3UK7EoQ", //prod
+                //webauthnClientId: "9f0e8422-2c2c-4d3b-a23b-3ce95de01a61", //dev
+                webauthnClientId: "4d497e15-c54c-4d29-8027-7bae02a474f1", //prod
+                registerRedirectUrl: "https://dotnet-mvc-sample.autharmordemos.com/magiclinkemail-register",
+                authenticationRedirectUrl: "https://dotnet-mvc-sample.autharmordemos.com/magiclinkemail-auth",
+                getNonce: function (auth) {
+                    // Get the nonce value dynamically... - we're using the CSRF token as the nonce here, but you can use anything
+                    var nonce = document.querySelector(`input[name='__RequestVerificationToken']`).value                    
+                    console.log(`Nonce: ${nonce}`);
+                    return nonce;
+                }
+            });
+
+            AuthArmor.form.mount(".form", {
+                usernameless: true, // Toggle usernameless auth - if false, the QR code wont render on page load.
+                methods: selectedMethods,
+                ...formConfig
+            });
+
+            AuthArmor.on("authSuccess", (data) => {                
+                //set form data
+                document.querySelector(`input[name='AuthRequest_Id']`).value = data.id;
+                document.querySelector(`input[name='AuthValidationToken']`).value = data.token;
+                document.querySelector(`input[name='AuthMethod']`).value = data.auth_method;
+                document.querySelector(`input[name='Nonce']`).value = document.querySelector(`input[name*='__RequestVerificationToken']`).value;
+                //submit the form
+                document.querySelector(".validateAuth-form").submit();
+            });
+
+            AuthArmor.on("registerSuccess", (data) => {
+
+                console.log("User Registered successfully!");
+                //setting form data
+                document.querySelector(`input[name='User_Id']`).value = data.user_id;
+                document.querySelector(`input[name='Username']`).value = data.username;
+                //submit the form
+                document.querySelector(".registerSuccess-form").submit();
+            });
+
+        })();
+    </script>
+    }
+    @*container to render the Auth Armor form*@
+    
+    <div class="content">        
+        <div class="form hidden"></div>
+    </div>
+    @*Hidden form to validate auth - using a form to make things easy and work with AntiForgeryToken*@
+    <form class="validateAuth-form hidden" asp-controller="Home" asp-action="ValidateAuthArmorAuth">
+        @Html.AntiForgeryToken()
+        <input type="hidden" name="AuthRequest_Id" />
+        <input type="hidden" name="AuthValidationToken" />
+        <input type="hidden" name="AuthMethod" />
+        <input type="hidden" name="Nonce" />
+    </form>
+    @*Hidden form to register a new user - using a form to make things easy and work with AntiForgeryToken*@
+    <form class="registerSuccess-form hidden" asp-controller="Home" asp-action="UserRegisterSuccess">
+        @Html.AntiForgeryToken()
+        <input type="hidden" name="User_Id" />
+        <input type="hidden" name="Username" />        
+    </form>
+
+    <div id="myModal" class="modal">
+        <!-- Modal content -->
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h1>Authenticated!</h1>
+            <p>Logging you in... please wait...</p>
+        </div>
+    </div>
