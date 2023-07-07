@@ -11,7 +11,7 @@ pool:
 
 variables:
 - name: BuildParameters.RestoreBuildProjects
-  value: 'samples/ASP.NET MVC/*.csproj'
+  value: 'samples/ASP.NET MVC/AuthArmorSdk.Samples.ASP.NET-MVC/*.csproj'
 
 steps:
   - task: DotNetCoreCLI@2
