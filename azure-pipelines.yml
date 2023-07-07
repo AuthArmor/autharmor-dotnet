@@ -29,6 +29,7 @@ jobs:
       displayName: Publish
       inputs:
         command: 'publish'
+        projects: $(BuildParameters.RestoreBuildProjects)
         arguments: --configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)
     - task: PublishBuildArtifacts@1
       displayName: PublishArtifacts
