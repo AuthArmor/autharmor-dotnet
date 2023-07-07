@@ -3,42 +3,13 @@
 # Add steps that publish symbols, save build artifacts, and more:
 # https://docs.microsoft.com/azure/devops/pipelines/languages/dotnet-core
 variables:
-- name: BuildParameters.RestoreMVCSampleBuildProjects
-  value: 'samples/ASP.NET MVC/AuthArmorSdk.Samples.ASP.NET-MVC/*.csproj'
-- name: BuildParameters.RestoreSDKProjects
+
+- name: BuildParameters.RestoreBuildProjects
   value: 'src/AuthArmor.Sdk/*.csproj'
 
 trigger:
 - main
 jobs:
-- job: BuildMVCSample
-  displayName: Build MVC Sample and Store Artifacts
-  pool:
-    vmImage: 'ubuntu-latest'
-  steps:
-    - task: DotNetCoreCLI@2
-      displayName: Restore
-      inputs:
-        command: restore
-        projects: $(BuildParameters.RestoreMVCSampleBuildProjects)
-    - task: DotNetCoreCLI@2
-      displayName: Build
-      inputs:
-        projects: $(BuildParameters.RestoreMVCSampleBuildProjects)
-        arguments: --configuration $(BuildConfiguration)
-    - task: DotNetCoreCLI@2
-      displayName: Publish
-      inputs:
-        command: 'publish'
-        publishWebProjects: true
-        arguments: --configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)/sample
-    - task: PublishBuildArtifacts@1
-      displayName: PublishArtifacts
-      inputs:
-        PathtoPublish: '$(Build.ArtifactStagingDirectory)'
-        ArtifactName: 'sample-drop'
-        publishLocation: 'Container'
-
 - job: BuildSDK
   displayName: Build SDK and Store Artifacts
   pool:
@@ -48,21 +19,21 @@ jobs:
       displayName: Restore
       inputs:
         command: restore
-        projects: $(BuildParameters.RestoreSDKProjects)
+        projects: $(BuildParameters.RestoreBuildProjects)
     - task: DotNetCoreCLI@2
       displayName: Build
       inputs:
-        projects: $(BuildParameters.RestoreSDKProjects)
+        projects: $(BuildParameters.RestoreBuildProjects)
         arguments: --configuration $(BuildConfiguration)
     - task: DotNetCoreCLI@2
       displayName: Publish
       inputs:
         command: 'publish'
         publishWebProjects: true
-        arguments: --configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)/sdk
+        arguments: --configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)
     - task: PublishBuildArtifacts@1
       displayName: PublishArtifacts
       inputs:
         PathtoPublish: '$(Build.ArtifactStagingDirectory)'
-        ArtifactName: 'sdk-drop'
+        ArtifactName: 'drop'
         publishLocation: 'Container'
