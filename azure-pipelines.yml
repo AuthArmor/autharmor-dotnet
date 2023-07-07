@@ -5,7 +5,7 @@
 variables:
 
 - name: BuildParameters.RestoreBuildProjects
-  value: 'src/AuthArmor.Sdk/*.csproj'
+  value: 'src/AuthArmor.Sdk/AuthArmor.Sdk.csproj'
 
 trigger:
 - main
