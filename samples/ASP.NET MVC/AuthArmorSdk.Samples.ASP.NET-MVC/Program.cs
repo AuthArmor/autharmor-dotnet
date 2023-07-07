@@ -1,4 +1,5 @@
 using AuthArmor.Sdk.Services;
+using AuthArmorSdk.Samples.ASP.NET_MVC.Configuration;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.Extensions.Configuration;
 
@@ -9,6 +10,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews();
 
 builder.Services.Configure<AuthArmor.Sdk.Infrastructure.AuthArmorConfiguration>(builder.Configuration.GetSection("AuthArmorConfig"));
+builder.Services.Configure<AuthArmorClientConfiguration>(builder.Configuration.GetSection("AuthArmorClientConfig"));
 
 builder.Services.AddAuthArmorSdkServices();
 
