@@ -31,7 +31,7 @@ jobs:
       inputs:
         command: 'publish'
         publishWebProjects: true
-        arguments: --configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)
+        arguments: --configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)/sample
     - task: PublishBuildArtifacts@1
       displayName: PublishArtifacts
       inputs:
@@ -59,7 +59,7 @@ jobs:
       inputs:
         command: 'publish'
         publishWebProjects: true
-        arguments: --configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)
+        arguments: --configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)/sdk
     - task: PublishBuildArtifacts@1
       displayName: PublishArtifacts
       inputs:
