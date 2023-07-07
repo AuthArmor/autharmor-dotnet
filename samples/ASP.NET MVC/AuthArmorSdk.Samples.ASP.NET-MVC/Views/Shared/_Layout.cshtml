@@ -6,54 +6,62 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Auth Armor SDK Demo</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css" />
+    @await RenderSectionAsync("Styles", required: false)
 </head>
 <body>
+    <nav class="navbar" role="navigation" aria-label="main navigation">
+        <div class="navbar-brand">
+            <a class="navbar-item" href="/">
+                <img src="/img/logo.png" width="28" height="28" />
+                <p class="has-text-weight-bold ml-1">Auth Armor .NET Sample</p>
+            </a>
 
-    <!-- START HEADER -->
-    <header class="header">
-        <div class="container">
-            <div class="navbar">
-                <div class="logo">
-                    <p>Auth Armor SDK Sample</p>
+            <button
+                id="navbar-toggler"
+                class="navbar-burger"
+                aria-label="menu"
+                aria-expanded="false"
+            >
+                <span aria-hidden="true"></span>
+                <span aria-hidden="true"></span>
+                <span aria-hidden="true"></span>
+            </button>
+        </div>
+
+        <div id="navbar-menu" class="navbar-menu">
+            <div class="navbar-start">
+                <a class="navbar-item" href="/">Home</a>
+            </div>
+
+            <div class="navbar-end">
+                <div class="navbar-item">
+                    <div class="buttons">
+                        @if (User?.Identity?.IsAuthenticated == true) {
+                            <a class="button is-danger" href="~/logout">
+                                <strong>Sign out</strong>
+                            </a>
+                        } else {
+                            <a class="button is-primary" href="~/login">
+                                <strong>Sign up or log in</strong>
+                            </a>
+                        }
+                    </div>
                 </div>
-                <nav>
-                    <ul id="menuItems">
-                        <li><a href="#">Home</a></li>
-                        <li><a href="#">About</a></li>
-                        <li><a href="#">Contact</a></li>
-                    </ul>
-                </nav>
-                
-                @if (User?.Identity?.IsAuthenticated == true)
-                {
-                    <a class="sign_up" href="~/logout">Sign out</a>
-                }
-                else
-                {
-                    <a class="sign_up" href="~/login">Sign in</a>
-                    <a class="sign_up" href="~/register">Register</a>
-                }
-                <img class="menu_icon" src="img/menu.png" onclick="menutoggle()" />
             </div>
         </div>
-    </header>
-    <!-- END HEADER -->
-        @RenderBody()
+    </nav>
+
+    @RenderBody()
+
     <script>
-        // TOGGLE MENU
-        var menuItems = document.getElementById("menuItems");
-        menuItems.style.maxHeight = "0px";
+        const navbarToggler = document.getElementById("navbar-toggler");
+        const navbarMenu = document.getElementById("navbar-menu");
 
-        function menutoggle() {
-            if (menuItems.style.maxHeight == "0px") {
-                menuItems.style.maxHeight = "200px";
-            } else {
-                menuItems.style.maxHeight = "0px";
-            }
-        }
-
+        navbarToggler.addEventListener("click", () => {
+            navbarToggler.classList.toggle("is-active");
+            navbarMenu.classList.toggle("is-active");
+        });
     </script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>

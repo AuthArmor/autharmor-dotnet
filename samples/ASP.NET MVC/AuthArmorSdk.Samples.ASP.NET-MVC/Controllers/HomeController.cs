@@ -28,22 +28,6 @@ namespace AuthArmorSdk.Samples.ASP.NET_MVC.Controllers
             _logger = logger;
         }
 
-        //authenticated route        
-
-        [Authorize]
-        [Route("LoggedIn")]
-        public IActionResult LoggedIn()
-        {
-            return View();
-        }
-
-        [Authorize]
-        [Route("Welcome")]
-        public IActionResult Welcome()
-        {
-            return View();
-        }
-
         //anon methods/routes
 
         //show login view
@@ -52,26 +36,7 @@ namespace AuthArmorSdk.Samples.ASP.NET_MVC.Controllers
         {
             return View();
         }
-
-        [HttpGet("register")]
-        public IActionResult Register()
-        {
-            return View();
-        }
-
-        //show logged out view
-        [Route("loggedout")]
-        public IActionResult LoggedOut()
-        {
-            return View();
-        }
-
-        public async Task<ActionResult> Index()
-        {
-            return View();
-        }
-
-        public IActionResult Privacy()
+        public IActionResult Index()
         {
             return View();
         }
@@ -85,11 +50,11 @@ namespace AuthArmorSdk.Samples.ASP.NET_MVC.Controllers
             {
                 await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
             }
-            catch (Exception ex)
+            catch
             {
             }
 
-            return RedirectToAction("LoggedOut");
+            return RedirectToAction("Index");
         }
 
         //validate auth armor auth for magiclink or webauthn
@@ -98,7 +63,7 @@ namespace AuthArmorSdk.Samples.ASP.NET_MVC.Controllers
         {
             switch (request.AuthMethod.ToLower())
             {
-                case "autharmorauthenticator":
+                case "authenticator":
                     {
                         var validateRequest = new AuthArmor.Sdk.Models.Auth.Authenticator.ValidateAuthenticatorAuthRequest
                         {
@@ -113,7 +78,7 @@ namespace AuthArmorSdk.Samples.ASP.NET_MVC.Controllers
                         }
                         break;
                     }
-                case "webauthn":
+                case "webAuthn":
                     {
                         var validateRequest = new AuthArmor.Sdk.Models.Auth.WebAuthn.ValidateWebAuthnAuthRequest
                         {
@@ -180,7 +145,7 @@ namespace AuthArmorSdk.Samples.ASP.NET_MVC.Controllers
 
             await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(identity));
 
-            return RedirectToAction("Welcome", "Home");
+            return RedirectToAction("Index", "Home");
 
         }
 
@@ -196,7 +161,7 @@ namespace AuthArmorSdk.Samples.ASP.NET_MVC.Controllers
 
             await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(identity));
 
-            return RedirectToAction("Welcome", "Home");
+            return RedirectToAction("Index", "Home");
         }
 
         
@@ -212,7 +177,7 @@ namespace AuthArmorSdk.Samples.ASP.NET_MVC.Controllers
 
             await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(identity));
 
-            return RedirectToAction("LoggedIn", "Home");
+            return RedirectToAction("Index", "Home");
         }
 
         
