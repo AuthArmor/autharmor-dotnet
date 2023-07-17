@@ -4,12 +4,15 @@
 @inject IOptions<AuthArmorClientConfiguration> ClientConfigurationOptions
 
 @section styles {
-    <link rel="stylesheet" href="https://cdn.autharmor.com/scripts/autharmor-js-ui/4.0.0-alpha.6/global/autharmor.css">
+    <link
+        rel="stylesheet"
+        href="https://cdn.autharmor.com/scripts/autharmor-js-ui/4.0.0-alpha.9/global/autharmor-js-ui.css"
+    />
 }
 
 @section scripts {
-    <script src="https://cdn.autharmor.com/scripts/autharmor-js/4.0.0-alpha.6/global/autharmor.js"></script>
-    <script src="https://cdn.autharmor.com/scripts/autharmor-js-ui/4.0.0-alpha.6/global/autharmor-ui.js"></script>
+<script src="https://cdn.autharmor.com/scripts/autharmor-js/4.0.0-alpha.9/global/autharmor-js.js"></script>
+<script src="https://cdn.autharmor.com/scripts/autharmor-js-ui/4.0.0-alpha.9/global/autharmor-js-ui.js"></script>
     <script>
         const config = {
             clientSdkApiKey: "@ClientConfigurationOptions.Value.ClientSdkApiKey",
