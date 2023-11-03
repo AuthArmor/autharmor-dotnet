@@ -7,8 +7,8 @@
     {
         public static IServiceCollection AddAuthArmorSdkServices(this IServiceCollection sCollection)
         {
-            sCollection.AddTransient<Auth.AuthService>();
-            sCollection.AddTransient<User.UserService>();
+            sCollection.AddSingleton<Auth.AuthService>();
+            sCollection.AddSingleton<User.UserService>();
             return sCollection;
         }
     }
