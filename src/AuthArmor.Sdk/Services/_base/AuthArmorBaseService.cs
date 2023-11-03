@@ -13,115 +13,124 @@
     using System.Net.Http;
     using System.Threading.Tasks;
     using System.Net;
+    using System.Transactions;
+    using System.Threading;
+    using System.Text.Json;
+    using Microsoft.Extensions.Logging;
+    using System.Net.Http.Json;
+    using System.Net.Http.Headers;
 
     public abstract class AuthArmorBaseService
     {
-        private readonly Uri _apiBaseUri = new Uri("https://api.autharmor.com/");
-        private readonly string _oidcBaseUri = "https://login.autharmor.com";
+        private const string _apiBaseUri = "https://api.autharmor.com";
+        private const string _oidcBaseUri = "https://login.autharmor.com";
+
+        private static HttpClient _httpClient = new HttpClient() { BaseAddress = new Uri(_apiBaseUri) };
+
+        /// <remarks>
+        /// Optional.
+        /// </remarks>
+        private readonly ILogger<AuthArmorBaseService> _logger;
 
         private string _oauthToken;
         private readonly IOptions<Infrastructure.AuthArmorConfiguration> _settings;
 
-        protected AuthArmorBaseService(IOptions<Infrastructure.AuthArmorConfiguration> settings)
+        protected AuthArmorBaseService(ILogger<AuthArmorBaseService> logger, IOptions<Infrastructure.AuthArmorConfiguration> settings)
         {
+            this._logger = logger;
             this._settings = settings;
             ValidateSettings();
         }
 
-        protected async Task<Stream> Post(string url, string postBody, Dictionary<string, string> headers = null)
+        protected async Task<TResponse> InvokeApiAsync<TBody, TResponse>(
+            HttpMethod method,
+            string path,
+            Dictionary<string, object> queryParameters,
+            TBody body,
+            string actionName,
+            CancellationToken cancellationToken = default
+        )
         {
-            using (var httpClient = new HttpClient())
+            try
             {
-                using (var postBodySC = new StringContent(postBody, System.Text.Encoding.UTF8, "application/json"))
+                var queryParamStrings = queryParameters
+                    .Select(param => $"{Uri.EscapeDataString(param.Key)}={Uri.EscapeDataString(param.Value.ToString())}");
+
+                var queryParamString = string.Join('&', queryParamStrings);
+
+                var finalPath = $"{path}?${queryParamString}";
+
+                string bodyJson = body is null ? null : JsonSerializer.Serialize(body);
+
+                var request = new HttpRequestMessage()
                 {
+                    Method = method,
+                    RequestUri = new Uri(finalPath),
+                    Content = body is null ? null : JsonContent.Create(body)
+                };
 
-                    httpClient.BaseAddress = this._apiBaseUri;
-                    httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", await GetAccessToken());
-                    httpClient.DefaultRequestHeaders.UserAgent.TryParseAdd(GetType().Assembly.GetName().Version.ToString());
-                    if (headers?.Any() == true)
-                    {
-                        foreach (var header in headers)
-                        {
-                            httpClient.DefaultRequestHeaders.Add(header.Key, header.Value);
-                        }
-                    }
+                request.Headers.UserAgent.TryParseAdd(GetType().Assembly.GetName().Version.ToString());
+                request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", await GetAccessToken());
 
-                    var result = await httpClient.PostAsync(url, postBodySC);
+                this._logger?.LogInformation($"Starting {actionName} ({method}) from Auth Armor API");
+                this._logger?.LogInformation("Calling Auth Armor API");
 
-                    if (result.IsSuccessStatusCode)
-                    {
-                        return await result.Content.ReadAsStreamAsync();
-                    }
-                    else
-                    {
-                        string errContent = await result.Content.ReadAsStringAsync();
-                        throw new Exceptions.AuthArmorHttpResponseException(result.StatusCode, errContent);
-                    }
-                }
-            }
-        }
+                this._logger?.LogDebug($"Request endpoint: {method} {finalPath}");
 
-        protected async Task<Stream> Put(string url, string postBody, Dictionary<string, string> headers = null)
-        {
-            using (var httpClient = new HttpClient())
-            {
-                using (var postBodySC = new StringContent(postBody, System.Text.Encoding.UTF8, "application/json"))
+                var polly = GetAsyncRetryPolicy();
+                var result = await polly.ExecuteAsync(() => _httpClient.SendAsync(request, cancellationToken));
+
+                if (!result.IsSuccessStatusCode)
                 {
+                    this._logger?.LogInformation($"FAILED {actionName} ({method})");
+                    this._logger?.LogError($"Error trying {actionName} ({method}).");
+                    this._logger?.LogError($"Error code: {result.StatusCode}");
 
-                    httpClient.BaseAddress = this._apiBaseUri;
-                    httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", await GetAccessToken());
-                    httpClient.DefaultRequestHeaders.UserAgent.TryParseAdd(GetType().Assembly.GetName().Version.ToString());
-                    if (headers?.Any() == true)
-                    {
-                        foreach (var header in headers)
-                        {
-                            httpClient.DefaultRequestHeaders.Add(header.Key, header.Value);
-                        }
-                    }
+                    var errContent = await result.Content.ReadAsStringAsync();
 
-                    var result = await httpClient.PutAsync(url, postBodySC);
-
-                    if (result.IsSuccessStatusCode)
-                    {
-                        return await result.Content.ReadAsStreamAsync();
-                    }
-                    else
-                    {
-                        string errContent = await result.Content.ReadAsStringAsync();
-                        throw new Exceptions.AuthArmorHttpResponseException(result.StatusCode, errContent);
-                    }
-                }
-            }
-        }
-
-        protected async Task<Stream> Get(string url, Dictionary<string, string> headers = null)
-        {
-            using (var httpClient = new HttpClient())
-            {
-                httpClient.BaseAddress = this._apiBaseUri;
-                httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", await GetAccessToken());
-                httpClient.DefaultRequestHeaders.UserAgent.TryParseAdd("AuthArmor_dotnet_SDK_v3.0.2");
-
-                if (headers?.Any() == true)
-                {
-                    foreach (var header in headers)
-                    {
-                        httpClient.DefaultRequestHeaders.Add(header.Key, header.Value);
-                    }
-                }
-                var result = await httpClient.GetAsync(url);
-
-                if (result.IsSuccessStatusCode)
-                {
-                    return await result.Content.ReadAsStreamAsync();
-                }
-                else
-                {
-                    string errContent = await result.Content.ReadAsStringAsync();
+                    this._logger?.LogError($"HTTP body: {errContent}");
                     throw new Exceptions.AuthArmorHttpResponseException(result.StatusCode, errContent);
                 }
+
+                var response = await result.Content.ReadFromJsonAsync<TResponse>(cancellationToken: cancellationToken);
+
+                this._logger?.LogInformation($"Successfully called {actionName} on Auth Armor API");
+
+                return response;
+            }
+            catch (AuthArmorException)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                this._logger?.LogInformation($"FAILED ${actionName} (${method})");
+                this._logger?.LogError($"Error trying ${actionName} (${method}).");
+
+                throw new Exceptions.AuthArmorException(ex.Message, ex);
             }
         }
+        
+        protected Task<TResponse> InvokeApiAsync<TResponse>(
+            HttpMethod method,
+            string path,
+            Dictionary<string, object> queryParameters,
+            string actionName,
+            CancellationToken cancellationToken = default
+        ) =>
+            InvokeApiAsync<object, TResponse>(method, path, queryParameters, body: null, actionName, cancellationToken);
+
+        protected Task<TResponse> GetAsync<TResponse>(string path, Dictionary<string, object> queryParameters, string actionName, CancellationToken cancellationToken = default) =>
+            InvokeApiAsync<TResponse>(HttpMethod.Get, path, queryParameters, actionName, cancellationToken);
+
+        protected Task<TResponse> PostAsync<TBody, TResponse>(string path, Dictionary<string, object> queryParameters, TBody body, string actionName, CancellationToken cancellationToken = default) =>
+            InvokeApiAsync<TBody, TResponse>(HttpMethod.Post, path, queryParameters, body, actionName, cancellationToken);
+
+        protected Task<TResponse> PutAsync<TBody, TResponse>(string path, Dictionary<string, object> queryParameters, TBody body, string actionName, CancellationToken cancellationToken = default) =>
+            InvokeApiAsync<TBody, TResponse>(HttpMethod.Put, path, queryParameters, body, actionName, cancellationToken);
+
+        protected Task<TResponse> DeleteAsync<TResponse>(string path, Dictionary<string, object> queryParameters, string actionName, CancellationToken cancellationToken = default) =>
+            InvokeApiAsync<TResponse>(HttpMethod.Delete, path, queryParameters, actionName, cancellationToken);
 
         protected static AsyncRetryPolicy GetAsyncRetryPolicy()
         {
