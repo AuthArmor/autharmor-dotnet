@@ -39,6 +39,14 @@ namespace AuthArmor.Sdk.Services.User
         private const string _startMagiclinkEmailChangeEmailRequestPath = "/v3/users/{0}/magiclink_email/update/start";
         private const string _validateMagiclinkEmailRegistrationTokenRequestPath = "/v3/users/register/magiclink_email/validate";
 
+        //user credential management
+        private const string _getUserCredentialsPath = "/v4/users/{0}/credentials";
+        private const string _getUserAuthenticatorCredentialsPath = "/v4/users/{0}/credentials/authenticator";
+        private const string _getUserWebAuthnCredentialsPath = "/v4/users/{0}/credentials/webauthn";
+        private const string _getUserMagiclinkEmailCredentialsPath = "/v4/users/{0}/credentials/magiclink_email";
+        private const string _getUserCredentialPath = "/v4/users/{0}/credentials/{1}";
+        private const string _disableUserCredentialPath = "/v4/users/{0}/credentials/{1}";
+
         public UserService(ILogger<AuthService> logger, IOptions<Infrastructure.AuthArmorConfiguration> settings)
             : base(logger, settings) { }
 
@@ -472,6 +480,136 @@ namespace AuthArmor.Sdk.Services.User
                 Models.User.Registration.MagiclinkEmail.ValidateMagiclinkEmailRegistrationRequest,
                 Models.User.Registration.MagiclinkEmail.ValidateMagiclinkEmailRegistrationResponse
             >(path, queryParams, request, nameof(ValidateMagiclinkEmailRegistrationToken));
+        }
+
+        public async Task<Models.User.Credentials.GetCredentialsPagedResponse> GetUserCredentialsByUsername(string username, int pageNumber, int pageSize, string sortDirection, string sortColumn)
+        {
+            var path = _getUserCredentialsPath;
+            var queryParams = new Dictionary<string, object>();
+
+            SetUsernameOrUser_Id(username, Guid.Empty, ref queryParams, ref path);
+            SetPaging(pageNumber, pageSize, sortDirection, sortColumn, ref queryParams);
+
+            return await GetAsync<
+                Models.User.Credentials.GetCredentialsPagedResponse
+            >(path, queryParams, nameof(GetUserCredentialsByUsername));
+        }
+
+        public async Task<Models.User.Credentials.GetCredentialsPagedResponse> GetUserCredentialsByUserId(Guid user_Id, int pageNumber, int pageSize, string sortDirection, string sortColumn)
+        {
+            var path = _getUserCredentialsPath;
+            var queryParams = new Dictionary<string, object>();
+
+            SetUsernameOrUser_Id(string.Empty, user_Id, ref queryParams, ref path);
+            SetPaging(pageNumber, pageSize, sortDirection, sortColumn, ref queryParams);
+
+            return await GetAsync<
+                Models.User.Credentials.GetCredentialsPagedResponse
+            >(path, queryParams, nameof(GetUserCredentialsByUserId));
+        }
+
+        public async Task<Models.User.Credentials.GetCredentialsPagedResponse> GetUserAuthenticatorCredentialsByUsername(string username, int pageNumber, int pageSize, string sortDirection, string sortColumn)
+        {
+            var path = _getUserAuthenticatorCredentialsPath;
+            var queryParams = new Dictionary<string, object>();
+
+            SetUsernameOrUser_Id(username, Guid.Empty, ref queryParams, ref path);
+            SetPaging(pageNumber, pageSize, sortDirection, sortColumn, ref queryParams);
+
+            return await GetAsync<
+                Models.User.Credentials.GetCredentialsPagedResponse
+            >(path, queryParams, nameof(GetUserAuthenticatorCredentialsByUsername));
+        }
+
+        public async Task<Models.User.Credentials.GetCredentialsPagedResponse> GetUserAuthenticatorCredentialsByUserId(Guid user_Id, int pageNumber, int pageSize, string sortDirection, string sortColumn)
+        {
+            var path = _getUserAuthenticatorCredentialsPath;
+            var queryParams = new Dictionary<string, object>();
+
+            SetUsernameOrUser_Id(string.Empty, user_Id, ref queryParams, ref path);
+            SetPaging(pageNumber, pageSize, sortDirection, sortColumn, ref queryParams);
+
+            return await GetAsync<
+                Models.User.Credentials.GetCredentialsPagedResponse
+            >(path, queryParams, nameof(GetUserAuthenticatorCredentialsByUserId));
+        }
+
+        public async Task<Models.User.Credentials.GetCredentialsPagedResponse> GetUserWebAuthnCredentialsByUsername(string username, int pageNumber, int pageSize, string sortDirection, string sortColumn)
+        {
+            var path = _getUserWebAuthnCredentialsPath;
+            var queryParams = new Dictionary<string, object>();
+
+            SetUsernameOrUser_Id(username, Guid.Empty, ref queryParams, ref path);
+            SetPaging(pageNumber, pageSize, sortDirection, sortColumn, ref queryParams);
+
+            return await GetAsync<
+                Models.User.Credentials.GetCredentialsPagedResponse
+            >(path, queryParams, nameof(GetUserWebAuthnCredentialsByUsername));
+        }
+
+        public async Task<Models.User.Credentials.GetCredentialsPagedResponse> GetUserWebAuthnCredentialsByUserId(Guid user_Id, int pageNumber, int pageSize, string sortDirection, string sortColumn)
+        {
+            var path = _getUserWebAuthnCredentialsPath;
+            var queryParams = new Dictionary<string, object>();
+
+            SetUsernameOrUser_Id(string.Empty, user_Id, ref queryParams, ref path);
+            SetPaging(pageNumber, pageSize, sortDirection, sortColumn, ref queryParams);
+
+            return await GetAsync<
+                Models.User.Credentials.GetCredentialsPagedResponse
+            >(path, queryParams, nameof(GetUserWebAuthnCredentialsByUserId));
+        }
+
+        public async Task<Models.User.Credentials.GetCredentialsPagedResponse> GetUserMagiclinkEmailCredentialsByUsername(string username, int pageNumber, int pageSize, string sortDirection, string sortColumn)
+        {
+            var path = _getUserMagiclinkEmailCredentialsPath;
+            var queryParams = new Dictionary<string, object>();
+
+            SetUsernameOrUser_Id(username, Guid.Empty, ref queryParams, ref path);
+            SetPaging(pageNumber, pageSize, sortDirection, sortColumn, ref queryParams);
+
+            return await GetAsync<
+                Models.User.Credentials.GetCredentialsPagedResponse
+            >(path, queryParams, nameof(GetUserMagiclinkEmailCredentialsByUsername));
+        }
+
+        public async Task<Models.User.Credentials.GetCredentialsPagedResponse> GetUserMagiclinkEmailCredentialsByUserId(Guid user_Id, int pageNumber, int pageSize, string sortDirection, string sortColumn)
+        {
+            var path = _getUserMagiclinkEmailCredentialsPath;
+            var queryParams = new Dictionary<string, object>();
+
+            SetUsernameOrUser_Id(string.Empty, user_Id, ref queryParams, ref path);
+            SetPaging(pageNumber, pageSize, sortDirection, sortColumn, ref queryParams);
+
+            return await GetAsync<
+                Models.User.Credentials.GetCredentialsPagedResponse
+            >(path, queryParams, nameof(GetUserMagiclinkEmailCredentialsByUserId));
+        }
+
+        public async Task<Models.User.Credentials.GetCredentialResponse> GetUserCredentialByUsername(string username, string credentialId)
+        {
+            var path = _getUserCredentialPath;
+            var queryParams = new Dictionary<string, object>();
+
+            SetUsernameOrUser_Id(username, Guid.Empty, ref queryParams, ref path);
+            path = string.Format(path, null, credentialId);
+
+            return await GetAsync<
+                Models.User.Credentials.GetCredentialResponse
+            >(path, queryParams, nameof(GetUserCredentialByUsername));
+        }
+
+        public async Task<Models.User.Credentials.GetCredentialResponse> GetUserCredentialByUserId(Guid user_Id, string credentialId)
+        {
+            var path = _getUserCredentialPath;
+            var queryParams = new Dictionary<string, object>();
+
+            SetUsernameOrUser_Id(string.Empty, user_Id, ref queryParams, ref path);
+            path = string.Format(path, null, credentialId);
+
+            return await GetAsync<
+                Models.User.Credentials.GetCredentialResponse
+            >(path, queryParams, nameof(GetUserCredentialByUserId));
         }
 
         private static void SetUsernameOrUser_Id(string username, Guid user_Id, ref Dictionary<string, object> queryParams, ref string urlPath)
